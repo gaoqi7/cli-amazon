@@ -25,8 +25,8 @@ function addNewDepartment() {
     ])
     .then(res => {
       connection.query(
-        "INSERT INTO products(department_name,over_head_costs) VALUES(?,?)",
-        [res.departmentName, res.overHeadCosts],
+        "INSERT INTO departments(department_name,over_head_costs) VALUES(?,?)",
+        [res.departmentName, parseInt(res.overHeadCosts)],
         err => {
           if (err) throw err;
           console.log("Add new department successfully");
@@ -43,7 +43,9 @@ function viewSalePerDep() {
       if (err) throw err;
       let hello = [];
       res.forEach(element => {
-        element.total_profit = element.total_sales - element.over_head_costs;
+        element.total_profit = (
+          element.total_sales - element.over_head_costs
+        ).toPrecision(7);
         hello.push(element);
       });
       console.table(hello);
@@ -51,4 +53,21 @@ function viewSalePerDep() {
     }
   );
 }
-viewSalePerDep();
+
+inquirer
+  .prompt([
+    {
+      name: "option",
+      type: "list",
+      message: "what do you want to do? ",
+      choices: ["View department sales", "Add new department"]
+    }
+  ])
+  .then(res => {
+    if (res.option === "View department sales") {
+      viewSalePerDep();
+    }
+    if (res.option === "Add new department") {
+      addNewDepartment();
+    }
+  });

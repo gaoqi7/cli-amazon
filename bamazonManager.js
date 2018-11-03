@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var cTable = require("console.table");
 var connection = mysql.createConnection({
   host: "localhost",
   user: "root",
@@ -11,7 +12,8 @@ function viewProductForSale() {
     "SELECT item_id,product_name,price,stock_quantity FROM products",
     (err, res) => {
       if (err) throw err;
-      console.log(res);
+      console.table(res);
+      // console.log(res);
       connection.end();
     }
   );
@@ -19,14 +21,15 @@ function viewProductForSale() {
 function viewLowInventory() {
   connection.query(
     "SELECT * FROM products WHERE stock_quantity < ?",
-    [70],
+    [5],
     (err, res) => {
       if (err) throw err;
 
       if (res.length === 0) {
         console.log("all good");
       } else {
-        console.log(res);
+        console.table(res);
+        // console.log(res);
       }
       connection.end();
     }
@@ -52,7 +55,6 @@ function addToInventory() {
         [{ item_id: res.chosenId }],
         (err, data) => {
           let b = data[0].stock_quantity;
-          console.log(b);
           connection.query(
             "UPDATE products SET ? WHERE ?",
             [
@@ -61,6 +63,7 @@ function addToInventory() {
             ],
             err => {
               if (err) throw err;
+              console.log("Done!");
               connection.end();
             }
           );
